@@ -210,25 +210,6 @@ A separate pool of lab subjects additionally provides **physiological recordings
 
 ---
 
-## 📖 Citation
-
-If you use this work, please cite:
-
-```bibtex
-@inproceedings{garciareal2026elirf,
-  title     = {{ELiRF-UPV at EXIST 2026: Multimodal Fusion and Few-Shot LLMs
-               for Sexism Detection in Memes and Videos}},
-  author    = {Garc{\'i}a-Real, Juan Alfonso and Ahuir, Vicent and
-               Castro-Bleda, Mar{\'i}a Jos{\'e}},
-  booktitle = {Working Notes of CLEF 2026 -- Conference and Labs of the
-               Evaluation Forum},
-  year      = {2026},
-  address   = {Jena, Germany}
-}
-```
-
----
-
 ## 👥 Authors
 
 **ELiRF Research Group · VRAIN · Universitat Politècnica de València**

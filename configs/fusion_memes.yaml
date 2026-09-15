@@ -1,0 +1,47 @@
+# System A - cross-attention fusion of the capsanocr text view with physiology,
+# meme side (EXIST 2026, Task 2).
+project_root: "~/EXIST_2026"
+
+modality: memes
+physio_kind: flat          # aggregate subjects into one vector per meme
+text_model: "FacebookAI/xlm-roberta-base"   # one bilingual EN+ES encoder
+max_len: 256
+seed: 42
+val_fraction: 0.15
+final_epochs: 5
+yes_threshold: 0.5
+
+team_name: ELiRF_UPV
+run_id: 2
+
+data:
+  train_json:
+    - "EXIST 2026 Dataset V0.1/Dataset - Evall/EXIST 2026 Memes Dataset/training/EXIST2026_training_memes.json"
+    - "EXIST 2026 Dataset V0.1/EXIST 2026 Memes Dataset/training/EXIST2026_training_memes.json"
+  train_media_dir:
+    - "EXIST 2026 Dataset V0.1/EXIST 2026 Memes Dataset/training/memes"
+  test_json:
+    - "EXIST 2026 Dataset V0.1/Dataset - Evall/EXIST 2026 Memes Dataset/test/EXIST2026_test_memes.json"
+  vlm_json:
+    - "EXIST 2026 Dataset V0.1/vlm_captions/vlm_captions_memes.json"
+
+run_dir: "runs/fusion_memes"
+
+training:
+  epochs: 5
+  batch_size: 16
+  lr_head: 5.0e-4
+  lr_backbone: 1.0e-5
+  warmup_frac: 0.1
+  grad_clip: 1.0
+  weight_decay: 0.01
+  p_drop: 0.2
+  sensor_hidden: 256
+  sensor_out: 128
+  fusion_hidden: 512
+  num_heads: 8
+  freeze_backbone: true
+
+hpo:
+  n_trials: 20
+  epochs: 4

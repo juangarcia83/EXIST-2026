@@ -1,0 +1,52 @@
+# Optional one-sentence justifications appended to each few-shot answer when
+# `use_rationale` is enabled. Each line restates, in the model's own answer
+# format, the rule from the system prompt that the exemplar illustrates.
+#
+# Off by default: it lengthens every answer, so raise `max_new_tokens` before
+# turning it on.
+
+t31:
+  rules:
+    "1": "Overt sexism: slurs or dehumanizing depictions targeting women or LGBTQ+."
+    "2": "Gender stereotypes used as the joke's premise."
+    "3": "Benevolent sexism: positive-sounding framings tying women to restrictive roles."
+    "4": "Anti-feminism or men-as-victims framing."
+    "5": "Sexualization or objectification of women."
+    "6": "Sexual-violence framing, including coercion or harassment as humor."
+    "7": "Counter-speech: video critically engages with sexism."
+    "8": "Ironic delivery whose punchline reinforces a stereotype."
+    "9": "Lip-sync to sexist audio that the creator amplifies."
+    "10": "Unrelated to gender (cooking, sports, pets, etc.)."
+    "11": "Features a woman but content is not about her gender."
+    "12": "Neutral reference to women or men with no hierarchy or stereotype."
+  default_rule:
+    "YES": "2"
+    "NO": "10"
+
+t32:
+  rules:
+    D1: "Punchline targets women or feminism."
+    D2: "Tradwife / high-value-woman content presented as aspirational."
+    D3: "Redpill or alpha-male framing where men are positioned as victims."
+    D4: "Sketch aimed downward - woman portrayed as incompetent for laughs."
+    D5: "Sexualization or rate-her framing of female bodies."
+    D6: "Sexual-violence humor framing coercion as playful."
+    D7: "Lip-syncs sexist audio sincerely, amplifying its message."
+    D8: "Misogynistic monologue delivered as advice or truth-telling."
+    J1: "Storytime denouncing harassment with critical tone."
+    J2: "Parody whose target is the sexist worldview, not women."
+    J3: "Stitch or duet calling out sexist content."
+    J4: "Feminist activism or pro-equality counter-speech."
+    J5: "Sexist trope reframed and visually subverted."
+    J6: "Visible markers of disapproval toward sexism received."
+  default_rule:
+    "DIRECT": "D4"
+    "JUDGEMENTAL": "J1"
+
+t33:
+  rules:
+    IDEOLOGICAL-INEQUALITY: "Anti-feminist or men-as-victims ideological framing."
+    STEREOTYPING-DOMINANCE: "Reinforces traditional gender roles or essentialist traits."
+    OBJECTIFICATION: "Reduces a woman to her body or imposes beauty standards."
+    SEXUAL-VIOLENCE: "Sexual coercion, assault or harassment framing."
+    MISOGYNY-NON-SEXUAL-VIOLENCE: "Hatred toward women or non-sexual violence framing."

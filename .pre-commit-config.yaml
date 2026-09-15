@@ -1,0 +1,30 @@
+# Run `pre-commit install` once; hooks then run on every commit.
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.9
+    hooks:
+      - id: ruff
+        args: [--fix]
+
+  - repo: https://github.com/psf/black
+    rev: 24.8.0
+    hooks:
+      - id: black
+
+  # Notebooks are committed without outputs: outputs make diffs unreadable,
+  # bloat the repository (one run left a 1.6 MB cell here) and can leak data.
+  - repo: https://github.com/kynan/nbstripout
+    rev: 0.7.1
+    hooks:
+      - id: nbstripout
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+        exclude: ^prompts/          # prompt files are byte-for-byte artifacts
+      - id: check-yaml
+      - id: check-added-large-files
+        args: [--maxkb=512]
+      - id: check-merge-conflict

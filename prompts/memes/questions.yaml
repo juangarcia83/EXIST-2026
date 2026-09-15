@@ -1,0 +1,9 @@
+# Per-subtask user turn appended after the media and the on-screen text.
+# The long system prompts live next to this file, one .txt per subtask.
+t21: "Looking at the image and the text together, is this meme sexist? Answer YES or NO."
+t22: "This meme is sexist. Looking at the image and the text together, what is the source intention? Answer DIRECT or JUDGEMENTAL."
+t23: "This meme is sexist. Looking at the image and the text together, which sexism categories apply? Answer with one or more categories from the label space."
+
+# Wrappers around the instance's own text, and the fallback when there is none.
+with_text: 'This meme contains the text: "{text}"'
+without_text: "(The meme has no extracted text.)"

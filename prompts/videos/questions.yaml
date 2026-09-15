@@ -1,0 +1,8 @@
+# Per-subtask user turn appended after the media and the transcribed text.
+# The long system prompts live next to this file, one .txt per subtask.
+t31: "Looking at the video and the transcribed text together, is this video sexist? Answer YES or NO."
+t32: "This video is sexist. Looking at the video and the transcribed text together, what is the source intention? Answer DIRECT or JUDGEMENTAL."
+t33: "This video is sexist. Looking at the video and the transcribed text together, which sexism categories apply? Answer with one or more categories from the label space."
+
+with_text: 'This video has the transcribed text: "{text}"'
+without_text: "(The video has no extracted text.)"

@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Run outputs. Everything the pipelines write lives under the data root
+# (EXIST2026_ROOT), but these show up if someone points the root at the clone.
+runs/
+cache_*/
+work_*/
+*.pt
+*.ckpt
+
+# The corpus is distributed by the EXIST organizers and is never committed.
+EXIST 2026 Dataset*/
+Dataset - Evall/
+
+# Notebook noise. Outputs are stripped by the pre-commit hook; this catches
+# checkpoints the hook does not see.
+.ipynb_checkpoints/
+*-checkpoint.ipynb
+
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      # Only the light core plus the dev tools: the test suite deliberately
+      # avoids torch, transformers and PyEvALL so CI stays a couple of minutes.
+      - name: Install
+        run: python -m pip install -e ".[dev]"
+
+      - name: Lint
+        run: |
+          python -m ruff check src tests scripts
+          python -m black --check src tests scripts
+
+      - name: Test
+        run: python -m pytest --cov=exist2026 --cov-report=term-missing
+
+      - name: Check notebooks are output-free
+        run: python -m nbstripout --verify notebooks/*.ipynb

@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: "If you use this software or its prompts, please cite the working-notes paper."
+title: "ELiRF-UPV at EXIST 2026: Multimodal Fusion and Few-Shot LLMs for Sexism Detection in Memes and Videos"
+abstract: >-
+  Code, prompts and configurations for the ELiRF-UPV participation in the EXIST 2026
+  shared task at CLEF 2026, covering all six subtasks over memes (Task 2) and short
+  TikTok videos (Task 3) under the Learning with Disagreements paradigm.
+type: software
+license: CC-BY-4.0
+repository-code: "https://github.com/juangarcia83/EXIST-2026"
+version: "0.1.0"
+authors:
+  - family-names: "García-Real"
+    given-names: "Juan Alfonso"
+    email: "jagarrea@etsinf.upv.es"
+    affiliation: "ELiRF, VRAIN, Universitat Politècnica de València"
+  - family-names: "Ahuir"
+    given-names: "Vicent"
+    email: "vahuir@upv.es"
+    affiliation: "ELiRF, VRAIN, Universitat Politècnica de València"
+  - family-names: "Castro-Bleda"
+    given-names: "María José"
+    email: "mcastro@dsic.upv.es"
+    affiliation: "ELiRF, VRAIN, Universitat Politècnica de València"
+keywords:
+  - sexism detection
+  - multimodal
+  - learning with disagreements
+  - few-shot learning
+  - CLEF
+  - EXIST

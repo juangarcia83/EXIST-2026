@@ -166,21 +166,61 @@ flowchart LR
 
 ## 🗂️ Repository Structure
 
-> ⏳ **The code, prompts, notebooks and configurations will be added to this repository.**
-> The planned layout is:
-
 ```
 EXIST-2026/
-├── prompts/              # Verbatim system prompts (System B), shared by both backends
-│   ├── memes/            # T2.1, T2.2, T2.3
-│   └── videos/           # T3.1, T3.2, T3.3
-├── notebooks/            # End-to-end notebooks for both system families
-│   ├── system_a/         # PhysioMeme-Fusion: training, fusion, ablations
-│   └── system_b/         # Few-shot cascade: Qwen 3.5 / Gemma 4
-├── configs/              # Full configurations + hyperparameter settings
-├── fewshot_pools/        # Cached, anti-leakage exemplar pools (training-only)
-└── README.md
+├── src/exist2026/            # The implementation. Modality is a parameter, never a fork.
+│   ├── taxonomy.py           #   label space, subtask keys, modality helpers
+│   ├── config.py             #   YAML-backed run configuration and path resolution
+│   ├── datasets.py           #   corpus loading into one table
+│   ├── submission.py         #   PyEvALL writers, format validation, packaging
+│   ├── labels/               #   hard (official thresholds) and soft (LeWiDi) aggregation
+│   ├── fewshot/              #   System B: pools · prompts · parsing · backends · cascade
+│   ├── fusion/               #   System A: text · physiology · model · training · HPO
+│   └── evaluation/           #   PyEvALL scoring + confusion / error / fallback reports
+├── prompts/                  # Verbatim system prompts — read at run time, not embedded
+│   ├── memes/                #   T2.1, T2.2, T2.3 (+ questions.yaml)
+│   └── videos/               #   T3.1, T3.2, T3.3 (+ questions.yaml, rationales.yaml)
+├── configs/                  # One YAML per system × modality; no paths in code
+├── notebooks/                # Thin narratives over the package, committed output-free
+├── scripts/                  # run_fewshot.py · run_fusion.py (resumable CLI runs)
+├── tests/                    # Unit tests; run without a GPU stack
+├── docs/                     # reproducing.md — step-by-step instructions
+└── paper/                    # The CLEF 2026 working-notes PDF
 ```
+
+Two rules shape this layout:
+
+- **Prompts are data, not code.** The files under `prompts/` are what the
+  pipeline actually sends, loaded at run time. The published prompts and the
+  executed ones cannot drift apart.
+- **The corpus never enters the repository.** Dataset paths are declared in
+  `configs/` as candidate lists and resolved against `EXIST2026_ROOT`; every
+  output a run produces is written under that same root.
+
+---
+
+## 🚀 Quickstart
+
+```bash
+pip install -e ".[all]"                 # or ".[dev]" for the light, GPU-free core
+export EXIST2026_ROOT=/path/to/the/EXIST-2026/corpus
+
+# Check the wiring: builds pools and prompts, stops before loading a model.
+python scripts/run_fewshot.py --config fewshot_memes --stage sanity --dry-run
+
+# System B — few-shot cascade. Sanity first, then the official run.
+python scripts/run_fewshot.py --config fewshot_memes  --stage sanity
+python scripts/run_fewshot.py --config fewshot_videos --stage submission
+
+# System A — cross-attention fusion.
+python scripts/run_fusion.py --config fusion_videos --steps hpo,train,submit
+
+make check                              # lint + tests
+```
+
+Both pipelines checkpoint as they go: re-running the same command after an
+interruption resumes instead of restarting. Full instructions, including the
+directory a run writes to, are in [`docs/reproducing.md`](docs/reproducing.md).
 
 ---
 
@@ -191,6 +231,10 @@ EXIST-2026/
 - **Secondary:** ICM, normalized ICM, F1 (hard–hard)
 - **Hierarchy:** enforced at evaluation time via `PARAM_HIERARCHY`, keeping per-subtask
   heads decoupled.
+- **Hard-label thresholds differ by modality** (Lab Guidelines V0.5, p. 17): memes need
+  `>3` / `>2` / `>1` votes across x.1 / x.2 / x.3, videos `>1` throughout. Instances below
+  the threshold have *no* hard label and are dropped from hard scoring rather than being
+  read as negative — see `exist2026.labels.hard`.
 
 ---
 
@@ -207,6 +251,28 @@ human-centered framework:
 A separate pool of lab subjects additionally provides **physiological recordings**
 (eye-tracking, heart rate, EEG — 16-channel 10–20 montage), each stimulus seen by only
 2–4 subjects. *(Data is distributed by the EXIST organizers and is not redistributed here.)*
+
+---
+
+## 🧰 Development
+
+```bash
+pip install -e ".[dev]"    # light core: no torch, no transformers
+make check                 # ruff + black + pytest
+make help                  # every available target
+pre-commit install         # ruff, black and nbstripout on every commit
+```
+
+The test suite runs **without a GPU stack**: the modules that decide correctness —
+label aggregation, pool selection, prompt assembly, response parsing, the submission
+format, the cascade's hierarchy and checkpointing — depend only on numpy and pandas, and
+the cascade is exercised against a scripted stand-in backend. Model loading, training and
+PyEvALL sit behind optional extras.
+
+Conventions worth knowing before contributing are in
+[`CONTRIBUTING.md`](CONTRIBUTING.md); the short version is that notebooks are committed
+without outputs, prompt text lives in `prompts/` and nowhere else, and anything a second
+run would want belongs in `src/exist2026/` with a test.
 
 ---
 

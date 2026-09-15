@@ -1,0 +1,48 @@
+# System A - cross-attention fusion of the capsanocr text view with physiology,
+# video side (EXIST 2026, Task 3).
+project_root: "~/EXIST_2026"
+
+modality: videos
+physio_kind: matrix        # one row per subject + attention pooling
+text_model: "j-hartmann/emotion-english-roberta-large"
+max_len: 512
+seed: 42
+val_fraction: 0.15
+final_epochs: 5
+yes_threshold: 0.5
+max_subjects: 4
+
+team_name: ELiRF_UPV
+run_id: 2
+
+data:
+  train_json:
+    - "EXIST 2026 Dataset V0.1/Dataset - Evall/EXIST 2026 Videos Dataset/training/EXIST2026_training.json"
+    - "EXIST 2026 Dataset V0.1/EXIST 2026 Videos Dataset/training/EXIST2026_training.json"
+  train_media_dir:
+    - "EXIST 2026 Dataset V0.1/EXIST 2026 Videos Dataset/training/videos"
+  test_json:
+    - "EXIST 2026 Dataset V0.1/Dataset - Evall/EXIST 2026 Videos Dataset/test/EXIST2026_test.json"
+  vlm_json:
+    - "cache_qwen_videos/vlm_video_analysis_qwen3vl_no_urls.json"
+
+run_dir: "runs/fusion_videos"
+
+training:
+  epochs: 5
+  batch_size: 16
+  lr_head: 5.0e-4
+  lr_backbone: 1.0e-5
+  warmup_frac: 0.1
+  grad_clip: 1.0
+  weight_decay: 0.01
+  p_drop: 0.2
+  sensor_hidden: 256
+  sensor_out: 128
+  fusion_hidden: 512
+  num_heads: 8
+  freeze_backbone: true
+
+hpo:
+  n_trials: 20
+  epochs: 4

@@ -1,0 +1,78 @@
+# System B - few-shot cascade over TikTok videos (EXIST 2026, Task 3).
+#
+# Same pipeline as `fewshot_memes.yaml`; the differences are the official hard
+# label thresholds (handled in code), smaller pools (each video costs far more
+# VRAM than a meme) and the bilingual / consensus-diversified pool selection.
+project_root: "~/EXIST_2026"
+
+modality: videos
+backend: gemma4          # gemma4 | qwen35
+stage: sanity
+seed: 42
+
+team_name: ELiRF_UPV
+run_id: 1
+
+max_eval_instances: 200
+checkpoint_every: 50     # video inference is slow; checkpoint more often
+use_rationale: false
+pool_seeds: 1
+
+# Frame sampling, honoured by backends that expose it (Qwen-VL). Lower these
+# first if you hit OOM.
+video_fps: 0.5
+video_max_pixels: 307200  # 480 * 640
+
+# null -> the most frequent category in TRAIN, computed when the data loads.
+categorization_fallback: null
+
+data:
+  train_json:
+    - "EXIST 2026 Dataset V0.1/EXIST 2026 Videos Dataset/training/EXIST2026_training.json"
+    - "EXIST 2026 Dataset V0.1/EXIST2026_training_videos.json"
+  train_media_dir:
+    - "EXIST 2026 Dataset V0.1/EXIST 2026 Videos Dataset/training/videos"
+    - "EXIST 2026 Dataset V0.1/videos"
+  test_json:
+    - "EXIST 2026 Dataset V0.1/Dataset - Evall/EXIST 2026 Videos Dataset/test/EXIST2026_test_clean.json"
+    - "Dataset - Evall/EXIST 2026 Videos Dataset/test/EXIST2026_test_clean.json"
+  test_media_dir:
+    - "EXIST 2026 Dataset V0.1/Dataset - Evall/EXIST 2026 Videos Dataset/test/videos"
+    - "Dataset - Evall/EXIST 2026 Videos Dataset/test/videos"
+
+run_dir: "runs/fewshot_videos_gemma4"
+
+backends:
+  qwen35:
+    model_id: "Qwen/Qwen3.5-27B"
+    model_classes: [AutoModelForImageTextToText]
+    needs_qwen_vl_utils: true
+    four_bit_below_vram: 24.0e9
+  gemma4:
+    model_id: "google/gemma-4-31B-it"
+    model_classes: [AutoModelForMultimodalLM]
+    needs_qwen_vl_utils: false
+    four_bit_below_vram: 24.0e9
+
+max_new_tokens:
+  t31: 512
+  t32: 512
+  t33: 1024
+
+pools:
+  t31:
+    per_class: 3
+    bilingual: true
+    diversify_consensus: true
+    high_consensus_fraction: 0.7
+    medium_consensus_range: [0.5, 0.7]
+  t32:
+    per_class: 3
+    bilingual: true
+    diversify_consensus: true
+    high_consensus_fraction: 0.7
+    medium_consensus_range: [0.5, 0.7]
+  t33:
+    per_class: 2
+    bilingual: true
+    cooccurrence_extra: 2   # genuinely multi-label exemplars

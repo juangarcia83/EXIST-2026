@@ -1,0 +1,73 @@
+# System B - few-shot cascade over memes (EXIST 2026, Task 2).
+#
+# Every path below is relative to `project_root`, which is overridden by the
+# EXIST2026_ROOT environment variable when it is set. The corpus is distributed
+# by the EXIST organizers and is not part of this repository.
+project_root: "~/EXIST_2026"
+
+modality: memes
+backend: gemma4          # gemma4 | qwen35
+stage: sanity            # sanity -> self-evaluation on TRAIN | submission -> official TEST
+seed: 42
+
+team_name: ELiRF_UPV
+run_id: 1
+
+# Sanity runs score a subset of TRAIN; submission runs always score the whole
+# official TEST split (this value is ignored there).
+max_eval_instances: 800
+checkpoint_every: 100
+use_rationale: false
+pool_seeds: 1
+
+data:
+  train_json:
+    - "EXIST 2026 Dataset V0.1/EXIST 2026 Memes Dataset/training/EXIST2026_training_memes.json"
+    - "EXIST 2026 Dataset V0.1/EXIST2026_training_memes.json"
+  train_media_dir:
+    - "EXIST 2026 Dataset V0.1/EXIST 2026 Memes Dataset/training/memes"
+    - "EXIST 2026 Dataset V0.1/memes"
+  test_json:
+    - "EXIST 2026 Dataset V0.1/Dataset - Evall/EXIST 2026 Memes Dataset/test/EXIST2026_test_clean.json"
+    - "Dataset - Evall/EXIST 2026 Memes Dataset/test/EXIST2026_test_clean.json"
+  test_media_dir:
+    - "EXIST 2026 Dataset V0.1/Dataset - Evall/EXIST 2026 Memes Dataset/test/memes"
+    - "Dataset - Evall/EXIST 2026 Memes Dataset/test/memes"
+
+run_dir: "runs/fewshot_memes_gemma4"
+
+backends:
+  qwen35:
+    model_id: "Qwen/Qwen3.5-27B"
+    # Tried in order: the concrete class name varies across transformers
+    # releases, so we fall back to the Auto classes.
+    model_classes:
+      - Qwen3_5ForConditionalGeneration
+      - Qwen3_5VLForConditionalGeneration
+      - AutoModelForImageTextToText
+      - AutoModelForCausalLM
+    needs_qwen_vl_utils: true
+    four_bit_below_vram: 48.0e9
+  gemma4:
+    model_id: "google/gemma-4-31B-it"
+    model_classes: [AutoModelForMultimodalLM]
+    needs_qwen_vl_utils: false
+    four_bit_below_vram: 48.0e9
+
+# Generous budgets: both backends may reason before emitting the label, and a
+# truncated answer would silently fall back to the default class.
+max_new_tokens:
+  t21: 512
+  t22: 512
+  t23: 1024
+
+# Anti-leakage exemplar pools, drawn from TRAIN only.
+# x.2 and x.3 only ever see instances the cascade already marked sexist, so
+# their pools carry no NO exemplar.
+pools:
+  t21:
+    per_class: 2          # 2 YES + 2 NO
+  t22:
+    per_class: 3          # 3 DIRECT + 3 JUDGEMENTAL
+  t23:
+    per_class: 2          # 2 per sexism category

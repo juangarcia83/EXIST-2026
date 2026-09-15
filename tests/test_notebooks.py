@@ -52,6 +52,15 @@ class TestNotebook:
             assert not cell.get("outputs"), f"{path.name} has committed outputs"
             assert cell.get("execution_count") is None
 
+    def test_every_cell_has_an_id(self, path):
+        """Required from nbformat 4.5; without it `nbstripout --verify` fails."""
+        notebook = load(path)
+        if notebook.get("nbformat_minor", 0) < 5:
+            pytest.skip("cell ids are only required from nbformat 4.5")
+        ids = [cell.get("id") for cell in notebook["cells"]]
+        assert all(ids), f"{path.name} has cells without an id"
+        assert len(set(ids)) == len(ids), f"{path.name} has duplicate cell ids"
+
     def test_opens_with_a_markdown_title(self, path):
         first = load(path)["cells"][0]
         assert first["cell_type"] == "markdown"
